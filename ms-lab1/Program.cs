@@ -43,16 +43,28 @@
                 arrival + service
                 );
 
-            //Client last = clients.Last();
-
-            //if (last != null && )
-
             if (arrival + service < working)
             {
                 Client client 
                     = new Client(arrival, service);
 
+                Client? last = clients.LastOrDefault();
+
+                if (last != null && client.Arrival <= last.Start + last.Service)
+                {
+                    client.Start = last.Start + last.Service;
+                }
+                else
+                {
+                    client.Start = arrival;
+                }
+
                 clients.Add(client);
+
+                if (client.Start + client.Service > working)
+                {
+                    break;
+                }
             }
             else break;
         }
@@ -66,9 +78,9 @@
         for (int i = 0; i < clients.Count; i++)
         {
             Predicate<Client> inQueue = (client) => 
-            client.Arrival >= clients[i].Arrival
+            client.Arrival >= clients[i].Start
             && 
-            client.Arrival <= clients[i].Arrival + clients[i].Service
+            client.Arrival <= clients[i].Start + clients[i].Service
             &&
             client != clients[i];
 
@@ -168,5 +180,13 @@ class Program
         // вывод результатов
         Console.WriteLine($"avg queue length = {avgQueueLength}");
         Console.WriteLine($"variance queue length = {varianceQueueLength}");
+
+        // test
+        for (int i = 0; i < barbershops[0].Clients.Count; i++)
+        {
+            Console.WriteLine($"{i}) arrival = {barbershops[0].Clients[i].Arrival}; " +
+                $"service = {barbershops[0].Clients[i].Service}; " +
+                $"start = {barbershops[0].Clients[i].Start}");
+        }
     }
 }
